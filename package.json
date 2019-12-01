@@ -5,7 +5,8 @@
 	},
 	"scripts": {
 		"watch": "tsc --watch",
-		"build": "tsc"
+		"build": "tsc",
+		"lint": "eslint --quiet src/**/*.ts"
 	},
 	"dependencies": {
 		"@types/chrome": "^0.0.91",
@@ -18,7 +19,13 @@
 		"eslint-plugin-node": "^10.0.0",
 		"eslint-plugin-promise": "^4.2.1",
 		"eslint-plugin-standard": "^4.0.1",
+		"husky": "^3.1.0",
 		"muicss": "^0.10.0",
 		"typescript": "^3.7.2"
+	},
+	"husky": {
+		"hooks": {
+			"pre-push": "pnpm run lint"
+		}
 	}
 }
