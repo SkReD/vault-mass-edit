@@ -1,0 +1,25 @@
+{
+    "env": {
+        "browser": true,
+        "commonjs": true,
+        "es6": true
+    },
+    "extends": "standard",
+    "globals": {
+        "chrome": "readonly"
+    },
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaVersion": 2018
+    },
+    "rules": {
+        "comma-dangle": ["error", "always-multiline"]
+    },
+    "overrides": [
+        {
+            "files": ["*.ts", "*.tsx"],
+            "rules": { "no-unused-vars": "off" }
+        }
+    ],
+    "plugins": ["@typescript-eslint/eslint-plugin"]
+}

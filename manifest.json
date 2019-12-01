@@ -1,0 +1,11 @@
+{
+  "name": "Vault Mass Edit",
+  "version": "1.0",
+  "description": "Add functionality for mass editing of secrets",
+  "permissions": ["storage"],
+  "background": {
+    "scripts": ["lib/background.js"],
+    "persistent": false
+  },
+  "manifest_version": 2
+}
