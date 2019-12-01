@@ -2,10 +2,20 @@
   "name": "Vault Mass Edit",
   "version": "1.0",
   "description": "Add functionality for mass editing of secrets",
-  "permissions": ["storage"],
+  "permissions": ["activeTab", "declarativeContent","storage"],
   "background": {
     "scripts": ["lib/background.js"],
     "persistent": false
   },
+  "page_action": {
+    "default_popup": "public/popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*/ui/vault/*"],
+      "js": ["lib/contentScript.js"]
+    }
+  ],
+  "options_page": "public/options.html",
   "manifest_version": 2
 }

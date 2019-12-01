@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="../node_modules/muicss/dist/css/mui.min.css" />
+    <script src="../node_modules/muicss/dist/js/mui.min.js"></script>
+
+    <style>
+        form {
+            padding: 10px 20px;
+            width: 600px;
+        }
+    </style>
+</head>
+<body>
+<form class="mui-form">
+    <div class="mui-textfield">
+        <input class="form-control" id="pattern" placeholder="Secrets path pattern"/>
+    </div>
+    <div class="mui-textfield">
+        <textarea class="form-control" id="jsonSecret" placeholder="Input values for update"></textarea>
+    </div>
+    <button id="submit" class="mui-btn mui-btn--raised">Submit</button>
+</form>
+<script src="../lib/popup.js"></script>
+</body>
+</html>
