@@ -36,7 +36,7 @@ function executeRequest<ResponseType> (path: Path, data?: Object) {
   }
 
   const req = new XMLHttpRequest()
-  req.open('GET', path)
+  req.open(data ? 'POST' : 'GET', path)
   req.setRequestHeader('x-vault-token', getAuthToken())
   req.send(data ? JSON.stringify(data) : null)
 
@@ -72,8 +72,20 @@ function listSecrets (path: Pattern) {
 function getMetadata (path: Pattern) {
   const parts = path.split('/')
 
-  return executeRequest<{ keys: string[] }>(`/v1${[parts[0], parts[1], 'metadata', ...parts.slice(2)].join('/')}`)
-    .then(data => data ? data.keys : [])
+  return executeRequest<Object>(`/v1${[parts[0], parts[1], 'metadata', ...parts.slice(2)].join('/')}`)
+}
+
+function getData (path: Pattern) {
+  const parts = path.split('/')
+
+  return executeRequest<{ data: { [key: string]: string }}>(`/v1${[parts[0], parts[1], 'data', ...parts.slice(2)].join('/')}`)
+    .then(({ data }) => data)
+}
+
+function writeData (path: Pattern, data: {[key: string]: string}) {
+  const parts = path.split('/')
+
+  return executeRequest<Object>(`/v1${[parts[0], parts[1], 'data', ...parts.slice(2)].join('/')}`)
 }
 
 function expandPattern (pattern: Pattern, paths: string[] = []): Promise<Path[]> {
@@ -111,7 +123,7 @@ function expandPattern (pattern: Pattern, paths: string[] = []): Promise<Path[]>
         if (e.errCode === 404) {
           // проверям, что по такому пути есть секрет
           return getMetadata(next)
-            .then(() => ([next]))
+            .then(() => ([next.replace(/\/$/, '')]))
             .catch(() => ([]))
         }
 
@@ -133,6 +145,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, callback) {
     }
 
     expandPattern(pattern)
+      .then(paths => Promise.all(paths.map(p => getData(p))))
       .then(success => callback({ success }))
       .catch((error: Error) => callback({ error: error.message }))
 

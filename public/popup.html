@@ -9,17 +9,27 @@
             padding: 10px 20px;
             width: 600px;
         }
+
+        #value-editor {
+            width: 100%;
+            min-height: 200px;
+        }
     </style>
+    <script src="scripts/ace.min.js"></script>
+    <script src="scripts/ace-mode-json.min.js"></script>
+    <script src="scripts/ace-theme-github.min.js"></script>
 </head>
 <body>
 <form class="mui-form">
     <div class="mui-textfield">
-        <input class="form-control" id="pattern" placeholder="Secrets path pattern"/>
+        <label for="pattern">Secrets path pattern</label>
+        <input class="form-control" id="pattern"/>
     </div>
     <div class="mui-textfield">
-        <textarea class="form-control" id="jsonSecret" placeholder="Input values for update"></textarea>
+        <label for="value-editor">Secrets value (json format)</label>
+        <div id="value-editor"></div>
     </div>
-    <button id="submit" class="mui-btn mui-btn--raised">Submit</button>
+    <button id="submit" class="mui-btn mui-btn--raised" disabled>Submit</button>
 
     <pre class="mui-panel" id="result" style="display: none">
 
