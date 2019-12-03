@@ -2,7 +2,8 @@
 
 type Pattern = string
 type Path = string
-const pathValidationRegex = /\/(([a-zA-Z-0-9]+?|\*)\/)+$/
+type WriteSecretMessage = { pattern: Pattern, value: string, options?: { dryRun?: boolean }}
+const pathValidationRegex = /(\/([a-zA-Z-0-9]+?|\*))+$/
 
 function validatePattern (path: Pattern) {
   if (!path) {
@@ -38,7 +39,7 @@ function executeRequest<ResponseType> (path: Path, data?: Object) {
   const req = new XMLHttpRequest()
   req.open(data ? 'POST' : 'GET', path)
   req.setRequestHeader('x-vault-token', getAuthToken())
-  req.send(data ? JSON.stringify(data) : null)
+  req.send(data ? JSON.stringify({ data }) : null)
 
   return new Promise<ResponseType>((resolve, reject) => {
     req.onloadend = function () {
@@ -85,7 +86,7 @@ function getData (path: Pattern) {
 function writeData (path: Pattern, data: {[key: string]: string}) {
   const parts = path.split('/')
 
-  return executeRequest<Object>(`/v1${[parts[0], parts[1], 'data', ...parts.slice(2)].join('/')}`)
+  return executeRequest<Object>(`/v1${[parts[0], parts[1], 'data', ...parts.slice(2)].join('/')}`, data)
 }
 
 function expandPattern (pattern: Pattern, paths: string[] = []): Promise<Path[]> {
@@ -96,6 +97,10 @@ function expandPattern (pattern: Pattern, paths: string[] = []): Promise<Path[]>
   while (part !== undefined && (part === '' || part.indexOf('*') === -1)) {
     solid.push(part)
     part = parts[++i]
+  }
+
+  if (solid.length === parts.length) {
+    return Promise.resolve([pattern])
   }
 
   const solidPath = solid.join('/')
@@ -137,7 +142,7 @@ function expandPattern (pattern: Pattern, paths: string[] = []): Promise<Path[]>
 
 chrome.runtime.onMessage.addListener(function (message, sender, callback) {
   if (message.type === 'writeSecret') {
-    const { pattern, value } = message.data
+    const { pattern, value, options: { dryRun = true } = {} }: WriteSecretMessage = message.data
     const patternErr = validatePattern(pattern)
     if (patternErr) {
       callback({ error: patternErr.message })
@@ -145,7 +150,22 @@ chrome.runtime.onMessage.addListener(function (message, sender, callback) {
     }
 
     expandPattern(pattern)
-      .then(paths => Promise.all(paths.map(p => getData(p))))
+      .then(paths => Promise.all(
+        paths.map(p => getData(p).then(
+          data => ({ data, path: p }),
+        )),
+      ))
+      .then(dataList => {
+        return Promise.all(dataList.map(({ data, path }) => {
+          const nextData = { ...data, ...JSON.parse(value) }
+
+          if (dryRun) {
+            return nextData
+          }
+
+          return writeData(path, nextData).then(result => ({ path, result }))
+        }))
+      })
       .then(success => callback({ success }))
       .catch((error: Error) => callback({ error: error.message }))
 

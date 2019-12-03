@@ -22,12 +22,18 @@
 <body>
 <form class="mui-form">
     <div class="mui-textfield">
-        <label for="pattern">Secrets path pattern</label>
+        <label for="pattern">Secrets path pattern (Example: /pfp/environments/pfp*/test-env/)</label>
         <input class="form-control" id="pattern"/>
     </div>
     <div class="mui-textfield">
         <label for="value-editor">Secrets value (json format)</label>
         <div id="value-editor"></div>
+    </div>
+    <div class="mui-checkbox">
+        <label>
+            <input type="checkbox" value="" id="dryRun">
+            Dry run
+        </label>
     </div>
     <button id="submit" class="mui-btn mui-btn--raised" disabled>Submit</button>
 
