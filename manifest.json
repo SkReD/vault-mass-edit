@@ -16,6 +16,10 @@
       "js": ["lib/contentScript/contentScript.js"]
     }
   ],
+  "icons": {
+    "16": "resources/icons/icons8-сейф-16.png",
+    "48": "resources/icons/icons8-сейф-48.png"
+  },
   "options_page": "public/options.html",
   "manifest_version": 2
 }
