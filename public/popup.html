@@ -12,7 +12,7 @@
 
         #value-editor {
             width: 100%;
-            min-height: 200px;
+            min-height: 100px;
         }
     </style>
     <script src="scripts/ace.min.js"></script>
@@ -23,7 +23,7 @@
 <form class="mui-form">
     <div class="mui-textfield">
         <label for="pattern">Secrets path pattern (Example: /pfp/environments/pfp*/test-env/)</label>
-        <input class="form-control" id="pattern"/>
+        <input class="form-control" id="pattern" required/>
     </div>
     <div class="mui-textfield">
         <label for="value-editor">Secrets value (json format)</label>
@@ -41,6 +41,6 @@
 
     </pre>
 </form>
-<script src="../lib/popup.js"></script>
+<script src="../lib/popup/popup.js" type="module"></script>
 </body>
 </html>

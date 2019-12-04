@@ -13,7 +13,7 @@
   "content_scripts": [
     {
       "matches": ["https://*/ui/vault/*"],
-      "js": ["lib/contentScript.js"]
+      "js": ["lib/contentScript/contentScript.js"]
     }
   ],
   "options_page": "public/options.html",

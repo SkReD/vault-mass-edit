@@ -1,8 +1,8 @@
 /* eslint-disable standard/no-callback-literal */
+import { Operation } from '../types.h'
 
-type Pattern = string
+type Pattern = Operation['data']['pattern']
 type Path = string
-type WriteSecretMessage = { pattern: Pattern, value: string, options?: { dryRun?: boolean }}
 const pathValidationRegex = /(\/([a-zA-Z-0-9]+?|\*))+$/
 
 function validatePattern (path: Pattern) {
@@ -52,7 +52,13 @@ function executeRequest<ResponseType> (path: Path, data?: Object) {
 
     req.onload = function () {
       if (req.status !== 404) {
-        resolve(JSON.parse(req.response).data)
+        const response = JSON.parse(req.response)
+
+        if (response.errors) {
+          reject(new Error(response.errors.join(', ')))
+        } else {
+          resolve(response.data)
+        }
       }
     }
     req.onerror = function () {
@@ -140,9 +146,9 @@ function expandPattern (pattern: Pattern, paths: string[] = []): Promise<Path[]>
     })
 }
 
-chrome.runtime.onMessage.addListener(function (message, sender, callback) {
+chrome.runtime.onMessage.addListener(function (message: Operation, sender, callback) {
   if (message.type === 'writeSecret') {
-    const { pattern, value, options: { dryRun = true } = {} }: WriteSecretMessage = message.data
+    const { pattern, secrets = '', options: { dryRun } = { dryRun: false } } = message.data
     const patternErr = validatePattern(pattern)
     if (patternErr) {
       callback({ error: patternErr.message })
@@ -157,10 +163,10 @@ chrome.runtime.onMessage.addListener(function (message, sender, callback) {
       ))
       .then(dataList => {
         return Promise.all(dataList.map(({ data, path }) => {
-          const nextData = { ...data, ...JSON.parse(value) }
+          const nextData = { ...data, ...JSON.parse(secrets) }
 
           if (dryRun) {
-            return nextData
+            return { path, result: nextData }
           }
 
           return writeData(path, nextData).then(result => ({ path, result }))
