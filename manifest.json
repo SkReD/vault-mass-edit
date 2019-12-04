@@ -1,5 +1,6 @@
 {
   "name": "Vault Mass Edit",
+  "homepage_url": "https://github.com/SkReD/vault-mass-edit",
   "version": "1.0",
   "description": "Add functionality for mass editing of secrets",
   "permissions": ["activeTab", "declarativeContent","storage"],
@@ -18,7 +19,8 @@
   ],
   "icons": {
     "16": "resources/icons/icons8-сейф-16.png",
-    "48": "resources/icons/icons8-сейф-48.png"
+    "48": "resources/icons/icons8-сейф-48.png",
+    "128": "resources/icons/icons8-сейф-128.png"
   },
   "options_page": "public/options.html",
   "manifest_version": 2
