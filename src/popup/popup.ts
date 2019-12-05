@@ -12,10 +12,12 @@ import {
 } from './ui.js'
 
 restoreLastOperation().then((lastOperation) => {
-  const { type, data: { pattern = '', secrets = '' } }: Operation = lastOperation
+  if (lastOperation) {
+    const { type, data: { pattern = '', secrets = '' } }: Operation = lastOperation
 
-  if (type === 'writeSecret') {
-    restoreValues({ pattern, secrets })
+    if (type === 'writeSecret') {
+      restoreValues({ pattern, secrets })
+    }
   }
 
   // Позволим отправку только после восстановления данных т.к. можно случайно отправить не то
