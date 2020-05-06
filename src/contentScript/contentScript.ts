@@ -3,7 +3,7 @@ import { Operation } from '../types.h'
 
 type Pattern = Operation['data']['pattern']
 type Path = string
-const pathValidationRegex = /(\/([a-zA-Z-0-9]+?|\*))+$/
+const pathValidationRegex = /^(\/(([-a-zA-Z0-9]*?)\*?([-a-zA-Z0-9]*?)))+$/
 
 function validatePattern (path: Pattern) {
   if (!path) {
@@ -33,7 +33,7 @@ function getAuthToken () {
 function executeRequest<ResponseType> (path: Path, data?: Object) {
   const token = getAuthToken()
   if (!token) {
-    return Promise.reject(new Error('Unathorized'))
+    return Promise.reject(new Error('Unauthorized'))
   }
 
   const req = new XMLHttpRequest()
@@ -119,14 +119,15 @@ function expandPattern (pattern: Pattern, paths: string[] = []): Promise<Path[]>
 
       const subPathPattern = parts[i]
       const nextSubPaths = subPaths
-        .filter(s => s.endsWith('/')) // пути без слеша на конце не содержат вложенные папки
         .filter(s => { // отсеиваем лишнее при помощи примитивного wildcard'а
           const parts = subPathPattern.split('*')
-          if (parts[0] === '') {
-            return true
+          const startsWithPart = s.startsWith(parts[0])
+
+          if (!parts[1] || !startsWithPart) {
+            return startsWithPart
           }
 
-          return s.startsWith(parts[0])
+          return s.replace(/\//g, '').endsWith(parts[1])
         })
       const nextPatterns = nextSubPaths.map(s => parts.slice(0, i).concat(s.replace(/\//g, '')).concat(parts.slice(i + 1)).join('/'))
 
